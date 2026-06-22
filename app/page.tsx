@@ -1,117 +1,59 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-
-const questions = [
-  {
-    id: 'mood',
-    question: 'Como você tá se sentindo agora?',
-    options: ['Ação', 'Romance', 'Terror', 'Comédia', 'Drama', 'Suspense'],
-  },
-  {
-    id: 'duration',
-    question: 'Quanto tempo você tem?',
-    options: ['Menos de 1h30', 'Até 2h', 'Pode ser longo'],
-  },
-  {
-    id: 'company',
-    question: 'Vai assistir com quem?',
-    options: ['Sozinho', 'Com alguém especial', 'Com a família', 'Com amigos'],
-  },
-  {
-    id: 'era',
-    question: 'Prefere de qual época?',
-    options: ['Clássico (antes de 90)', 'Anos 90-2000', 'Anos 2010', 'Atual'],
-  },
-  {
-    id: 'depth',
-    question: 'Que tipo de experiência quer?',
-    options: ['Entretenimento puro', 'Algo que faça pensar', 'Baseado em fatos reais'],
-  },
-  {
-    id: 'origin',
-    question: 'Alguma preferência de origem?',
-    options: ['Não importa', 'Hollywood', 'Cinema europeu', 'Anime', 'Cinema latino'],
-  },
-];
+import { useAuth } from './lib/auth-context';
 
 export default function Home() {
   const router = useRouter();
-  const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [extra, setExtra] = useState('');
-  const [loading, setLoading] = useState(false);
+  const { user, loading } = useAuth();
 
-  const current = questions[step];
-  const isLastQuestion = step === questions.length - 1;
-
-  function handleOption(value: string) {
-    const updated = { ...answers, [current.id]: value };
-    setAnswers(updated);
-
-    if (isLastQuestion) {
-      handleSubmit(updated);
+  function handleComLogin() {
+    if (user) {
+      router.push('/home');
     } else {
-      setStep(step + 1);
+      router.push('/login');
     }
   }
 
-  async function handleSubmit(finalAnswers: Record<string, string>) {
-    setLoading(true);
-
-    const payload = extra
-      ? { ...finalAnswers, extra }
-      : finalAnswers;
-
-    const res = await fetch('http://localhost:3000/quiz/recommend', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await res.json();
-    localStorage.setItem('zion-result', JSON.stringify(data));
-    router.push('/resultado');
-  }
-
-  if (loading) {
-    return (
-      <main className="flex items-center justify-center min-h-screen">
-        <p className="text-lg">Buscando o filme perfeito pra você...</p>
-      </main>
-    );
-  }
+  if (loading) return null;
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen gap-6 p-8">
-      <p className="text-sm text-gray-400">{step + 1} de {questions.length}</p>
-      <h1 className="text-2xl font-bold text-center">{current.question}</h1>
-
-      <div className="flex flex-col gap-3 w-full max-w-md">
-        {current.options.map((option) => (
-          <button
-            key={option}
-            onClick={() => handleOption(option)}
-            className="border rounded-lg px-4 py-3 text-left hover:bg-gray-100 hover:text-black transition"
-          >
-            {option}
-          </button>
-        ))}
+    <main className="flex flex-col items-center justify-center min-h-screen gap-12 p-8 text-center">
+      <div className="flex flex-col gap-4">
+        <h1 className="text-6xl font-bold">Zion</h1>
+        <p className="text-xl text-gray-400">Seu guia de filmes personalizado com IA</p>
       </div>
 
-      {isLastQuestion && (
-        <div className="w-full max-w-md flex flex-col gap-2">
-          <p className="text-sm text-gray-400">Quer adicionar algo? (opcional)</p>
-          <textarea
-            className="border rounded-lg p-3 w-full text-sm"
-            rows={3}
-            placeholder="Ex: quero algo que me surpreenda no final..."
-            value={extra}
-            onChange={(e) => setExtra(e.target.value)}
-          />
+      <div className="flex flex-col gap-3 text-left max-w-md w-full">
+        <h2 className="text-lg font-semibold text-center">Como funciona</h2>
+        <div className="flex gap-3 items-start">
+          <span className="text-2xl">🎯</span>
+          <p className="text-gray-400">Responda um quiz rápido sobre seu humor e preferências</p>
         </div>
-      )}
+        <div className="flex gap-3 items-start">
+          <span className="text-2xl">🤖</span>
+          <p className="text-gray-400">Nossa IA analisa suas respostas e sugere o filme perfeito</p>
+        </div>
+        <div className="flex gap-3 items-start">
+          <span className="text-2xl">🎬</span>
+          <p className="text-gray-400">Com login, salvamos seu histórico e melhoramos as sugestões</p>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3 w-full max-w-sm">
+        <button
+          onClick={handleComLogin}
+          className="bg-white text-black font-semibold px-6 py-3 rounded-lg hover:bg-gray-200 transition"
+        >
+          Entrar e usar com histórico
+        </button>
+        <button
+          onClick={() => router.push('/quiz')}
+          className="border px-6 py-3 rounded-lg hover:bg-gray-100 hover:text-black transition"
+        >
+          Usar sem login
+        </button>
+      </div>
     </main>
   );
 }
