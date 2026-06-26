@@ -36,7 +36,7 @@ export default function Home() {
         <div className="flex items-center gap-4">
           <button
             onClick={handleComLogin}
-            className="flex items-center gap-2 px-4 py-2 text-xs font-medium tracking-wide rounded-full bg-white/[0.03] border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.06] text-slate-300 backdrop-blur-md transition-all duration-300"
+            className=" cursor-pointer flex items-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.15em] uppercase rounded-full bg-gradient-to-r from-purple-500/15 to-indigo-500/15 border border-purple-400/30 text-purple-100 backdrop-blur-md shadow-[0_0_25px_rgba(168,85,247,0.2)] hover:from-purple-500/25 hover:to-indigo-500/25 hover:border-purple-300/60 hover:shadow-[0_0_40px_rgba(168,85,247,0.35)] transition-all duration-300"
           >
             <svg
               className="w-3 h-3 text-white opacity-80"
@@ -65,17 +65,45 @@ export default function Home() {
         </div>
       </nav>
 
-      <div className="flex flex-col gap-4">
-        <h1 className="text-5xl md:text-6xl font-light tracking-[0.2em] uppercase bg-clip-text text-transparent bg-gradient-to-b from-indigo-200 via-purple-300 to-slate-500 font-sans select-none">
+      <div className="flex flex-col gap-4 mt-30">
+        <h1 className="text-5xl md:text-9xl font-light tracking-[0.2em] uppercase bg-clip-text text-transparent bg-gradient-to-b from-indigo-200 via-purple-300 to-slate-500 font-sans select-none">
           Zion
         </h1>
-        <p className="text-lg md:text-xl text-slate-400 font-normal max-w-xl mx-auto tracking-wide leading-relaxed">
-          Pare de gastar tempo procurando filmes. Encontramos o seu filme{" "}
+        <p className="text-2xl md:text-3xl text-slate-400 font-normal max-w-xl mx-auto tracking-wide leading-relaxed">
+          O filme certo para o{" "}
           <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 via-purple-300 to-purple-400">
-            em segundos
+            seu momento.
           </span>
-          .
         </p>
+        <div className="flex flex-col gap-3 w-full max-w-xs mx-auto mt-2">
+          <button
+            onClick={() => router.push("/quiz")}
+            className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 text-xs font-semibold tracking-[0.2em] uppercase rounded-full bg-white/[0.04] border border-white/10 hover:border-purple-500/40 text-slate-200 hover:text-white backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_0_30px_rgba(168,85,247,0.2)] transition-all duration-500 overflow-hidden"
+          >
+            <span className=" cursor-pointer absolute inset-0 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <span>Encontrar meu filme</span>
+            <svg
+              className="w-3 h-3 transform group-hover:translate-x-1 transition-transform duration-300 text-slate-400 group-hover:text-purple-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+              />
+            </svg>
+          </button>
+
+          <button
+            onClick={handleComLogin}
+            className=" cursor-pointer inline-flex items-center justify-center px-8 py-3 text-xs font-medium tracking-[0.15em] uppercase rounded-full rounded-fullbg-gradient-to-r from-purple-500/15 to-indigo-500/15 border border-purple-400/30 text-purple-100 backdrop-blur-md shadow-[0_0_25px_rgba(168,85,247,0.2)] hover:from-purple-500/25 hover:to-indigo-500/25 hover:border-purple-300/60 hover:shadow-[0_0_40px_rgba(168,85,247,0.35)] transition-all duration-300"
+          >
+            Entrar e salvar histórico
+          </button>
+        </div>
       </div>
       <div className="relative w-full max-w-5xl mx-auto my-8 overflow-hidden py-10 pointer-events-none z-10 select-none">
         {/* Container inclinado (Perspective e Rotate criam o efeito 3D da imagem) */}
@@ -128,7 +156,7 @@ export default function Home() {
           {/* Card 5*/}
           <div className="w-36 h-52 md:w-44 md:h-64 rounded-xl bg-slate-900 border border-white/10 overflow-hidden shadow-2xl transition-all duration-300 relative group flex-shrink-0 backdrop-blur-md">
             <img
-              src="https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?q=80&w=500&auto=format&fit=crop"
+              src="bolt.png"
               alt="Poster 5"
               className="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition"
             />
@@ -136,6 +164,12 @@ export default function Home() {
           </div>
         </div>
       </div>
+      <h2 className="text-lg md:text-4xl font-bold tracking-wide uppercase text-slate-100 leading-snug">
+        Pare de gastar tempo em catálogos. <br />
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 via-purple-300 to-purple-400">
+          Escolhemos seu filme em segundos.
+        </span>
+      </h2>
       {/* ─── BOTÃO PRINCIPAL (CTA: ENCONTRAR MEU FILME) ─── */}
       <div className="z-30 my-1 animate-fade-in">
         <button
@@ -165,41 +199,6 @@ export default function Home() {
         </button>
       </div>
       
-      <div className="flex flex-col gap-3 text-left max-w-md w-full">
-        <h2 className="text-lg font-semibold text-center">Como funciona</h2>
-        <div className="flex gap-3 items-start">
-          <span className="text-2xl">🎯</span>
-          <p className="text-gray-400">
-            Responda um quiz rápido sobre seu humor e preferências
-          </p>
-        </div>
-        <div className="flex gap-3 items-start">
-          <span className="text-2xl">🤖</span>
-          <p className="text-gray-400">
-            Nossa IA analisa suas respostas e sugere o filme perfeito
-          </p>
-        </div>
-        <div className="flex gap-3 items-start">
-          <span className="text-2xl">🎬</span>
-          <p className="text-gray-400">
-            Com login, salvamos seu histórico e melhoramos as sugestões
-          </p>
-        </div>
-      </div>
-      <div className="flex flex-col gap-3 w-full max-w-sm">
-        <button
-          onClick={handleComLogin}
-          className="bg-white text-black font-semibold px-6 py-3 rounded-lg hover:bg-gray-200 transition"
-        >
-          Entrar e usar com histórico
-        </button>
-        <button
-          onClick={() => router.push("/quiz")}
-          className="border px-6 py-3 rounded-lg hover:bg-gray-100 hover:text-black transition"
-        >
-          Usar sem login
-        </button>
-      </div>
     </main>
   );
 }
