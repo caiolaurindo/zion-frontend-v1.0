@@ -42,19 +42,23 @@ export default function Home() {
   }, [user, loading]);
 
   useEffect(() => {
-    if (!session) return;
+  if (!session) return;
 
+  function fetchHistory() {
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/history`, {
-      headers: {
-        Authorization: `Bearer ${session.access_token}`,
-      },
+      headers: { Authorization: `Bearer ${session!.access_token}` },
     })
       .then((res) => res.json())
       .then((data) => {
         setHistory(data);
         setLoadingHistory(false);
       });
-  }, [session]);
+  }
+
+  fetchHistory();
+  window.addEventListener('focus', fetchHistory);
+  return () => window.removeEventListener('focus', fetchHistory);
+}, [session]);
 
   async function handleSignOut() {
     await signOut();

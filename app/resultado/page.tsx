@@ -95,7 +95,8 @@ export default function Resultado() {
           <h2 className="text-3xl font-bold">{movie.title}</h2>
           <p className="text-gray-400">{movie.year} · {movie.runtime} · ⭐ {movie.rating}</p>
           <p className="text-sm"><span className="font-semibold">Diretor:</span> {movie.director}</p>
-          <p className="text-sm"><span className="font-semibold">Elenco:</span> {movie.actors.join(', ')}</p>
+          <p className="text-sm"><span className="font-semibold">Elenco:</span>{" "}
+  {movie.actors?.join(", ") || "Não informado"}</p>
           <p className="text-sm mt-2">{movie.plot}</p>
 
           <div className="flex gap-3 mt-4">
