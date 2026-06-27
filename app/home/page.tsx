@@ -30,6 +30,11 @@ export default function Home() {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
+  const [loadingRandom, setLoadingRandom] = useState(false);
+  const [lastRandom, setLastRandom] = useState<HistoryItem["movie"] | null>(
+    null,
+  );
+
   const firstName =
     user?.user_metadata?.full_name?.split(" ")[0] ??
     user?.email?.split("@")[0] ??
@@ -42,23 +47,28 @@ export default function Home() {
   }, [user, loading]);
 
   useEffect(() => {
-  if (!session) return;
+    const saved = localStorage.getItem("zion-random");
+    if (saved) setLastRandom(JSON.parse(saved));
+  }, []);
 
-  function fetchHistory() {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/history`, {
-      headers: { Authorization: `Bearer ${session!.access_token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setHistory(data);
-        setLoadingHistory(false);
-      });
-  }
+  useEffect(() => {
+    if (!session) return;
 
-  fetchHistory();
-  window.addEventListener('focus', fetchHistory);
-  return () => window.removeEventListener('focus', fetchHistory);
-}, [session]);
+    function fetchHistory() {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/history`, {
+        headers: { Authorization: `Bearer ${session!.access_token}` },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setHistory(data);
+          setLoadingHistory(false);
+        });
+    }
+
+    fetchHistory();
+    window.addEventListener("focus", fetchHistory);
+    return () => window.removeEventListener("focus", fetchHistory);
+  }, [session]);
 
   async function handleSignOut() {
     await signOut();
@@ -104,12 +114,33 @@ export default function Home() {
     }
   }
 
+  async function handleRandom() {
+    setLoadingRandom(true);
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+
+    if (session?.access_token) {
+      headers["Authorization"] = `Bearer ${session.access_token}`;
+    }
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/quiz/random`, {
+      method: "POST",
+      headers,
+    });
+
+    const data = await res.json();
+    localStorage.setItem("zion-random", JSON.stringify(data));
+    localStorage.setItem("zion-result", JSON.stringify(data));
+    setLastRandom(data);
+    setLoadingRandom(false);
+    router.push("/resultado");
+  }
+
   const latest = history[0] ?? null;
-
   const favorites = history.filter((h) => h.liked === true);
-
   const [favoriteIndex, setFavoriteIndex] = useState(0);
-
   const visibleFavorites = favorites.slice(favoriteIndex, favoriteIndex + 4);
 
   const nextFavorites = () => {
@@ -125,7 +156,6 @@ export default function Home() {
   };
 
   if (loading) return null;
-
   return (
     <div className=" bg-[#0a0a0c]">
       {/* Drawer lateral */}
@@ -257,12 +287,22 @@ export default function Home() {
           </p>
         </div>
 
-        <button
-          onClick={() => router.push("/quiz")}
-          className="group cursor-pointer w-fit h-[50px] text-2xl mt-[-20px] font-light tracking-wide inline-flex items-center justify-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-purple-500/15 to-indigo-500/15 border border-purple-400/30 text-purple-100 backdrop-blur-md shadow-[0_0_25px_rgba(168,85,247,0.2)] hover:from-purple-500/25 hover:to-indigo-500/25 hover:border-purple-300/60 hover:shadow-[0_0_40px_rgba(168,85,247,0.35)] transition-all duration-300"
-        >
-          Descobrir um filme
-        </button>
+        <div className="flex gap-3 mt-[-20px]">
+          <button
+            onClick={() => router.push("/quiz")}
+            className="group cursor-pointer w-fit h-[50px] text-2xl font-light tracking-wide inline-flex items-center justify-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-purple-500/15 to-indigo-500/15 border border-purple-400/30 text-purple-100 backdrop-blur-md shadow-[0_0_25px_rgba(168,85,247,0.2)] hover:from-purple-500/25 hover:to-indigo-500/25 hover:border-purple-300/60 hover:shadow-[0_0_40px_rgba(168,85,247,0.35)] transition-all duration-300"
+          >
+            Descobrir um filme
+          </button>
+
+          <button
+            onClick={handleRandom}
+            disabled={loadingRandom}
+            className="group cursor-pointer w-fit h-[50px] text-2xl font-light tracking-wide inline-flex items-center justify-center gap-3 px-6 py-3 rounded-full bg-white/[0.03] border border-white/10 hover:border-purple-500/30 text-slate-400 hover:text-slate-200 backdrop-blur-md transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loadingRandom ? "..." : "Surpreenda-me"}
+          </button>
+        </div>
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="flex flex-col gap-8 flex-1">
             {latest && (
@@ -438,6 +478,44 @@ export default function Home() {
           </div>
 
           <div className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-4">
+            {lastRandom && (
+              <div className="flex flex-col gap-3">
+                <p className="text-[15px] mt-[10px] tracking-[0.3em] uppercase text-white">
+                  Última escolha Aleatória
+                </p>
+                <div
+                  className="flex  gap-3 p-3 rounded-xl bg-gradient-to-br from-indigo-950/30 to-purple-950/20 border border-indigo-500/20 hover:border-indigo-500/40 transition-all duration-300 cursor-pointer"
+                  onClick={() => {
+                    const fakeItem = {
+                      id: "",
+                      liked: null,
+                      watched: false,
+                      createdAt: "",
+                      movie: lastRandom,
+                    };
+                    setSelectedItem(fakeItem as HistoryItem);
+                  }}
+                >
+                  <img
+                    src={lastRandom.poster}
+                    alt={lastRandom.title}
+                    className="w-[112px] rounded-lg flex-shrink-0 object-cover"
+                  />
+                  <div className="flex flex-col gap-1 min-w-0">
+                    <p className="text-xs font-semibold text-slate-300 truncate">
+                      {lastRandom.title}
+                    </p>
+                    
+                    <p className="text-[10px] text-slate-600">
+                      {lastRandom.year} · ⭐ {lastRandom.rating}
+                    </p>
+                    <p className="text-[10px] text-indigo-400/60 tracking-widest uppercase">
+                      Aleatório
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
             <p className="text-[20px] tracking-[0.3em] uppercase text-white">
               Histórico
             </p>
