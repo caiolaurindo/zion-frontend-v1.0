@@ -367,7 +367,7 @@ export default function Home() {
                 </p>
                 <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-zion">
                   {history
-                    .filter((h) => h.watched)
+                    .filter((h) => h.watched) .slice(0, 8)
                     .map((h) => (
                       <div
                         key={h.id}
