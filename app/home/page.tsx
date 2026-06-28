@@ -131,7 +131,8 @@ export default function Home() {
       setFavoriteIndex((prev) => prev + 4);
     }
   };
-
+  const [lastQuizLiked, setLastQuizLiked] = useState<boolean | null>(null);
+  const [lastQuizWatched, setLastQuizWatched] = useState(false);
   const prevFavorites = () => {
     if (favoriteIndex > 0) {
       setFavoriteIndex((prev) => Math.max(0, prev - 4));
@@ -324,46 +325,99 @@ export default function Home() {
                     </p>
                     <div className="flex gap-2 mt-2 flex-wrap">
                       <button
-                        onClick={() =>
+                        onClick={() => {
                           handleAction(lastQuiz.historyId, "like", {
                             id: lastQuiz.historyId,
-                            liked: null,
-                            watched: false,
+                            liked: lastQuiz.liked,
+                            watched: lastQuiz.watched,
                             movie: lastQuiz,
-                          })
-                        }
-                        className="flex items-center gap-2 px-4 py-2 rounded-full text-xs border border-white/10 text-slate-400 hover:border-purple-500/30 hover:text-purple-300 transition-all duration-300"
+                          });
+
+                          setLastQuiz((prev) =>
+                            prev
+                              ? {
+                                  ...prev,
+                                  liked: prev.liked === true ? null : true,
+                                }
+                              : prev,
+                          );
+                        }}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs border transition-all duration-300 ${
+                          lastQuiz.liked === true
+                            ? "bg-purple-500/20 border-purple-500/50 text-purple-300"
+                            : "border-white/10 text-slate-400 hover:border-purple-500/30 hover:text-purple-300"
+                        }`}
                       >
-                        <AiOutlineHeart className="w-3 h-3" />
+                        {lastQuiz.liked === true ? (
+                          <AiFillHeart className="w-3 h-3" />
+                        ) : (
+                          <AiOutlineHeart className="w-3 h-3" />
+                        )}
                         Curtir
                       </button>
+
                       <button
-                        onClick={() =>
+                        onClick={() => {
                           handleAction(lastQuiz.historyId, "dislike", {
                             id: lastQuiz.historyId,
-                            liked: null,
-                            watched: false,
+                            liked: lastQuiz.liked,
+                            watched: lastQuiz.watched,
                             movie: lastQuiz,
-                          })
-                        }
-                        className="flex items-center gap-2 px-4 py-2 rounded-full text-xs border border-white/10 text-slate-400 hover:border-red-500/30 hover:text-red-300 transition-all duration-300"
+                          });
+
+                          setLastQuiz((prev) =>
+                            prev
+                              ? {
+                                  ...prev,
+                                  liked: prev.liked === false ? null : false,
+                                }
+                              : prev,
+                          );
+                        }}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs border transition-all duration-300 ${
+                          lastQuiz.liked === false
+                            ? "bg-red-500/20 border-red-500/50 text-red-300"
+                            : "border-white/10 text-slate-400 hover:border-red-500/30 hover:text-red-300"
+                        }`}
                       >
-                        <BiDislike className="w-3 h-3" />
+                        {lastQuiz.liked === false ? (
+                          <BiSolidDislike className="w-3 h-3" />
+                        ) : (
+                          <BiDislike className="w-3 h-3" />
+                        )}
                         Não curtir
                       </button>
+
                       <button
-                        onClick={() =>
+                        onClick={() => {
                           handleAction(lastQuiz.historyId, "watched", {
                             id: lastQuiz.historyId,
-                            liked: null,
-                            watched: false,
+                            liked: lastQuiz.liked,
+                            watched: lastQuiz.watched,
                             movie: lastQuiz,
-                          })
-                        }
-                        className="flex items-center gap-2 px-4 py-2 rounded-full text-xs border border-white/10 text-slate-400 hover:border-indigo-500/30 hover:text-indigo-300 transition-all duration-300"
+                          });
+
+                          setLastQuiz((prev) =>
+                            prev
+                              ? {
+                                  ...prev,
+                                  watched: !prev.watched,
+                                }
+                              : prev,
+                          );
+                        }}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs border transition-all duration-300 ${
+                          lastQuiz.watched
+                            ? "bg-indigo-500/20 border-indigo-500/50 text-indigo-300"
+                            : "border-white/10 text-slate-400 hover:border-indigo-500/30 hover:text-indigo-300"
+                        }`}
                       >
-                        <MdOutlineLocalMovies className="w-3 h-3" />
-                        Marcar assistido
+                        {lastQuiz.watched ? (
+                          <MdLocalMovies className="w-3 h-3" />
+                        ) : (
+                          <MdOutlineLocalMovies className="w-3 h-3" />
+                        )}
+                        {lastQuiz.watched ? "Assistido" : "Marcar assistido"}
                       </button>
                     </div>
                   </div>
