@@ -125,7 +125,21 @@ export default function Home() {
   const favorites = history.filter((h) => h.liked === true);
   const [favoriteIndex, setFavoriteIndex] = useState(0);
   const visibleFavorites = favorites.slice(favoriteIndex, favoriteIndex + 4);
-  const [lastQuiz, setLastQuiz] = useState<any>(null);
+  type LastQuiz = {
+    historyId: string;
+    title: string;
+    poster: string;
+    year: string;
+    runtime: string;
+    rating: string;
+    director: string;
+    actors: string[];
+    plot: string;
+    liked: boolean | null;
+    watched: boolean;
+  };
+
+  const [lastQuiz, setLastQuiz] = useState<LastQuiz | null>(null);
   const nextFavorites = () => {
     if (favoriteIndex + 4 < favorites.length) {
       setFavoriteIndex((prev) => prev + 4);
