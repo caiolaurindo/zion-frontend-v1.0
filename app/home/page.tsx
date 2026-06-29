@@ -343,6 +343,7 @@ export default function Home() {
                         onClick={() => {
                           handleAction(lastQuiz.historyId, "like", {
                             id: lastQuiz.historyId,
+                             createdAt: new Date().toISOString(),
                             liked: lastQuiz.liked,
                             watched: lastQuiz.watched,
                             movie: lastQuiz,
@@ -375,6 +376,7 @@ export default function Home() {
                         onClick={() => {
                           handleAction(lastQuiz.historyId, "dislike", {
                             id: lastQuiz.historyId,
+                             createdAt: new Date().toISOString(),
                             liked: lastQuiz.liked,
                             watched: lastQuiz.watched,
                             movie: lastQuiz,
@@ -407,6 +409,7 @@ export default function Home() {
                         onClick={() => {
                           handleAction(lastQuiz.historyId, "watched", {
                             id: lastQuiz.historyId,
+                            createdAt: new Date().toISOString(),
                             liked: lastQuiz.liked,
                             watched: lastQuiz.watched,
                             movie: lastQuiz,
