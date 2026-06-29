@@ -11,6 +11,7 @@ import { MdOutlineLocalMovies, MdLocalMovies } from "react-icons/md";
 interface HistoryItem {
   id: string;
   liked: boolean | null;
+  createdAt: string;
   watched: boolean;
   movie: {
     title: string;
