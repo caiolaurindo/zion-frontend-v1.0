@@ -2,10 +2,25 @@
 
 import { useRouter } from "next/navigation";
 import { useAuth } from "./lib/auth-context";
+import { useEffect, useRef, useState } from "react";
+
+const posters = [
+  "panico.png",
+  "pulp.png",
+  "diariodeumapaixao.png",
+  "batman.png",
+
+  "truquedemestre.png",
+  "bastardosInglorios.png",
+  "tokio.png",
+  "bolt.png",
+  "jogadorn1.png",
+];
 
 export default function Home() {
   const router = useRouter();
   const { user, loading } = useAuth();
+  const [neonProgress, setNeonProgress] = useState(0);
 
   function handleComLogin() {
     if (user) {
@@ -15,28 +30,79 @@ export default function Home() {
     }
   }
 
+  // Animação neon da esquerda pra direita
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNeonProgress((prev) => {
+        if (prev >= 100) return 0;
+        return prev + 0.8;
+      });
+    }, 16);
+    return () => clearInterval(interval);
+  }, []);
+
   if (loading) return null;
 
   return (
     <main className="relative flex flex-col items-center justify-center min-h-screen gap-12 p-8 text-center overflow-hidden bg-[#0a0a0c]">
-      <div className="absolute top-[-20%] left-1/2 -translate-x-1/1 w-150 h-[600px] rounded-full bg-gradient-to-r from-purple-900/30 to-indigo-900/20 blur-[120px] pointer-events-none z-0" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] rounded-full bg-amber-500/5 blur-[100px] pointer-events-none z-0" />
-      <div className="absolute top-[30%] left-2/3 -translate-x-3/6 w-[600px] h-[600px] rounded-full bg-gradient-to-r from-blue-900/30 to-indigo-900/20 blur-[120px] pointer-events-none z-0" />
+      {/* Luzes animadas */}
+      {/* Luzes estáticas */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-[0.15] mix-blend-overlay z-0"
+        className="absolute rounded-full pointer-events-none z-0"
+        style={{
+          top: "-120px",
+          left: "-150px",
+          width: "600px",
+          height: "600px",
+          background:
+            "radial-gradient(circle, rgba(139,92,246,0.25) 0%, transparent 70%)",
+          filter: "blur(80px)",
+        }}
+      />
+
+      <div
+        className="absolute rounded-full pointer-events-none z-0"
+        style={{
+          top: "25%",
+          right: "-120px",
+          width: "500px",
+          height: "500px",
+          background:
+            "radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 70%)",
+          filter: "blur(80px)",
+        }}
+      />
+
+      <div
+        className="absolute rounded-full pointer-events-none z-0"
+        style={{
+          bottom: "-120px",
+          left: "35%",
+          width: "400px",
+          height: "400px",
+          background:
+            "radial-gradient(circle, rgba(168,85,247,0.15) 0%, transparent 70%)",
+          filter: "blur(60px)",
+        }}
+      />
+
+      {/* Noise */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.12] mix-blend-overlay z-0"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
         }}
       />
+
+      {/* Nav */}
       <nav className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between w-full max-w-7xl mx-auto px-6 py-6 md:px-12">
-        {/* LOGO (Estilo fino e espaçado idêntico ao h1 principal) */}
         <div className="text-xl font-light tracking-[0.25em] uppercase bg-clip-text text-transparent bg-gradient-to-r from-indigo-200 via-purple-300 to-slate-400 font-sans select-none cursor-pointer">
           Zion
         </div>
         <div className="flex items-center gap-4">
           <button
             onClick={handleComLogin}
-            className=" cursor-pointer flex items-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.15em] uppercase rounded-full bg-gradient-to-r from-purple-500/15 to-indigo-500/15 border border-purple-400/30 text-purple-100 backdrop-blur-md shadow-[0_0_25px_rgba(168,85,247,0.2)] hover:from-purple-500/25 hover:to-indigo-500/25 hover:border-purple-300/60 hover:shadow-[0_0_40px_rgba(168,85,247,0.35)] transition-all duration-300"
+            className="cursor-pointer flex items-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.15em] uppercase rounded-full bg-gradient-to-r from-purple-500/15 to-indigo-500/15 border border-purple-400/30 text-purple-100 backdrop-blur-md shadow-[0_0_25px_rgba(168,85,247,0.2)] hover:from-purple-500/25 hover:to-indigo-500/25 hover:border-purple-300/60 transition-all duration-300"
           >
             <svg
               className="w-3 h-3 text-white opacity-80"
@@ -65,22 +131,46 @@ export default function Home() {
         </div>
       </nav>
 
-      <div className="flex flex-col gap-4 mt-30">
-        <h1 className="text-5xl md:text-9xl font-light tracking-[0.2em] uppercase bg-clip-text text-transparent bg-gradient-to-b from-indigo-200 via-purple-300 to-slate-500 font-sans select-none">
-          Zion
-        </h1>
-        <p className="text-2xl md:text-3xl text-slate-400 font-normal max-w-xl mx-auto tracking-wide leading-relaxed">
+      {/* Hero */}
+      <div className="relative z-10 flex flex-col items-center gap-4 mt-20">
+        {/* Título com efeito neon da esquerda pra direita */}
+        <div className="relative select-none">
+          {/* Texto base apagado */}
+          <h1 className="text-6xl md:text-9xl font-light tracking-[0.2em] uppercase text-slate-800 font-sans">
+            Zion
+          </h1>
+          {/* Texto iluminado com clip animado */}
+          <h1
+            className="absolute inset-0 text-6xl md:text-9xl font-light tracking-[0.2em] uppercase font-sans bg-clip-text text-transparent"
+            style={{
+              backgroundImage: `linear-gradient(90deg, 
+                #818cf8 0%, 
+                #a78bfa ${neonProgress - 15}%, 
+                #e2e8f0 ${neonProgress}%, 
+                #a78bfa ${neonProgress + 15}%, 
+                #4338ca 100%
+              )`,
+              backgroundSize: "200% 100%",
+              filter: `drop-shadow(0 0 ${8 + Math.sin(neonProgress * 0.1) * 4}px rgba(139,92,246,0.8))`,
+            }}
+          >
+            Zion
+          </h1>
+        </div>
+
+        <p className="text-xl md:text-2xl text-slate-400 font-normal max-w-xl mx-auto tracking-wide leading-relaxed">
           O filme certo para o{" "}
           <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 via-purple-300 to-purple-400">
             seu momento.
           </span>
         </p>
-        <div className="flex flex-col gap-3 w-full max-w-xs mx-auto mt-2">
+
+        <div className="flex gap-3 mt-2">
           <button
             onClick={() => router.push("/quiz")}
             className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 text-xs font-semibold tracking-[0.2em] uppercase rounded-full bg-white/[0.04] border border-white/10 hover:border-purple-500/40 text-slate-200 hover:text-white backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_0_30px_rgba(168,85,247,0.2)] transition-all duration-500 overflow-hidden"
           >
-            <span className=" cursor-pointer absolute inset-0 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <span className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <span>Encontrar meu filme</span>
             <svg
               className="w-3 h-3 transform group-hover:translate-x-1 transition-transform duration-300 text-slate-400 group-hover:text-purple-300"
@@ -99,90 +189,71 @@ export default function Home() {
 
           <button
             onClick={handleComLogin}
-            className=" cursor-pointer inline-flex items-center justify-center px-8 py-3 text-xs font-medium tracking-[0.15em] uppercase rounded-full rounded-fullbg-gradient-to-r from-purple-500/15 to-indigo-500/15 border border-purple-400/30 text-purple-100 backdrop-blur-md shadow-[0_0_25px_rgba(168,85,247,0.2)] hover:from-purple-500/25 hover:to-indigo-500/25 hover:border-purple-300/60 hover:shadow-[0_0_40px_rgba(168,85,247,0.35)] transition-all duration-300"
+            className="cursor-pointer inline-flex items-center justify-center px-8 py-4 text-xs font-medium tracking-[0.15em] uppercase rounded-full border border-purple-400/30 text-purple-100 backdrop-blur-md hover:border-purple-300/60 hover:shadow-[0_0_40px_rgba(168,85,247,0.35)] transition-all duration-300"
           >
             Entrar e salvar histórico
           </button>
         </div>
       </div>
-      <div className="relative w-full max-w-5xl mx-auto my-8 overflow-hidden py-10 pointer-events-none z-10 select-none">
-        {/* Container inclinado (Perspective e Rotate criam o efeito 3D da imagem) */}
-        <div className="flex items-center justify-center gap-6 transform [transform:rotateX(16deg)_rotateY(-12deg)_rotateZ(4deg)] opacity-85">
-          {/* Card 1*/}
-          <div className="w-36 h-52 md:w-44 md:h-64 rounded-xl bg-slate-900 border border-white/10 overflow-hidden shadow-2xl transition-all duration-300 relative group flex-shrink-0 backdrop-blur-md">
-            <img
-              src="truquedemestre.png"
-              alt="Poster 1"
-              className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-          </div>
 
-          {/* Card 2*/}
-          <div className="w-36 h-52 md:w-44 md:h-64 rounded-xl bg-slate-900 border border-white/15 overflow-hidden shadow-2xl transition-all duration-300 relative group flex-shrink-0 backdrop-blur-md -translate-y-4">
-            <img
-              src="/bastardosInglorios.png"
-              alt="Poster 2"
-              className="w-full h-full object-cover group-hover:grayscale-0 transition"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-          </div>
+      <div className="relative w-[1200px] overflow-hidden z-10 py-4">
+        <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[#0a0a0c] to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[#0a0a0c] to-transparent z-10 pointer-events-none" />
 
-          {/* Card 3*/}
-          <div className="w-40 h-56 md:w-48 md:h-72 rounded-xl bg-slate-900 border border-purple-500/30 overflow-hidden shadow-[0_0_40px_rgba(168,85,247,0.15)] transition-all duration-300 relative group flex-shrink-0 backdrop-blur-md -translate-y-8 scale-105">
-            <img
-              src="diariodeumapaixao.png"
-              alt="Poster Destaque"
-              className="w-full h-full object-cover transition"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-purple-950/90 via-black/20 to-transparent" />
-            <div className="absolute bottom-3 left-3 right-3 text-left">
-              <span className="text-[10px] bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded-full font-medium tracking-widest uppercase">
-                escolha do zion
-              </span>
-            </div>
-          </div>
-
-          {/* Card 4*/}
-          <div className="w-36 h-52 md:w-44 md:h-64 rounded-xl bg-slate-900 border border-white/15 overflow-hidden shadow-2xl transition-all duration-300 relative group flex-shrink-0 backdrop-blur-md -translate-y-4">
-            <img
-              src="tokio.png"
-              alt="Poster 4"
-              className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-          </div>
-
-          {/* Card 5*/}
-          <div className="w-36 h-52 md:w-44 md:h-64 rounded-xl bg-slate-900 border border-white/10 overflow-hidden shadow-2xl transition-all duration-300 relative group flex-shrink-0 backdrop-blur-md">
-            <img
-              src="bolt.png"
-              alt="Poster 5"
-              className="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 transition"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-          </div>
+        <div
+          className="flex gap-4"
+          style={{
+            animation: "scrollLeft 40s linear infinite",
+            width: "max-content",
+          }}
+        >
+          {[...posters, ...posters].map((src, i) => {
+            const isCenter = i === 2 || i === 2 + posters.length;
+            return (
+              <div
+                key={i}
+                className={`rounded-xl overflow-hidden flex-shrink-0 border shadow-2xl relative transition-all duration-300 ${
+                  isCenter
+                    ? "w-40 h-46 md:w-48 md:h-72 border-purple-500/30 shadow-[0_0_40px_rgba(168,85,247,0.2)] scale-105 -translate-y-4"
+                    : "w-32 h-48 md:w-36 md:h-52 border-white/10"
+                }`}
+              >
+                <img
+                  src={src}
+                  alt=""
+                  className="w-full h-full object-cover opacity-80 hover:opacity-100 transition"
+                />
+                <div
+                  className={`absolute inset-0 ${isCenter ? "bg-gradient-to-t from-purple-950/90 via-black/20 to-transparent" : "bg-gradient-to-t from-black/80 via-transparent to-transparent"}`}
+                />
+                {isCenter && (
+                  <div className="absolute bottom-3 left-3 right-3 text-left">
+                    <span className="text-[10px] bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded-full font-medium tracking-widest uppercase">
+                      escolha do zion
+                    </span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
-      <h2 className="text-lg md:text-4xl font-bold tracking-wide uppercase text-slate-100 leading-snug">
-        Pare de gastar tempo em catálogos. <br />
-        <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 via-purple-300 to-purple-400">
-          Escolhemos seu filme em segundos.
-        </span>
-      </h2>
-      {/* ─── BOTÃO PRINCIPAL (CTA: ENCONTRAR MEU FILME) ─── */}
-      <div className="z-30 my-1 animate-fade-in">
+
+      {/* Headline */}
+      <div className="relative z-10 flex flex-col items-center gap-8">
+        <h2 className="text-2xl md:text-4xl font-bold tracking-wide uppercase text-slate-100 leading-snug">
+          Pare de gastar tempo em catálogos. <br />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 via-purple-300 to-purple-400">
+            Escolhemos seu filme em segundos.
+          </span>
+        </h2>
+
         <button
           onClick={() => router.push("/quiz")}
           className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 text-xs font-semibold tracking-[0.2em] uppercase rounded-full bg-white/[0.04] border border-white/10 hover:border-purple-500/40 text-slate-200 hover:text-white backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_0_30px_rgba(168,85,247,0.2)] transition-all duration-500 overflow-hidden"
         >
-          {/* Efeito de brilho/gradiente radial que segue o hover sutilmente no fundo */}
           <span className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-          {/* Texto do Botão */}
           <span>Encontrar meu filme</span>
-
-          {/* Ícone de Flecha Minimalista (Seta para a direita) */}
           <svg
             className="w-3 h-3 transform group-hover:translate-x-1 transition-transform duration-300 text-slate-400 group-hover:text-purple-300"
             fill="none"
@@ -198,7 +269,19 @@ export default function Home() {
           </svg>
         </button>
       </div>
-      
+
+      {/* Keyframes */}
+      <style>{`
+       
+        @keyframes scrollLeft {
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        @keyframes scrollRight {
+          0%   { transform: translateX(-50%); }
+          100% { transform: translateX(0); }
+        }
+      `}</style>
     </main>
   );
 }
