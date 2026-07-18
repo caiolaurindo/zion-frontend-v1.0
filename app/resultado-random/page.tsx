@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../lib/auth-context';
+import { MdStar} from "react-icons/md";
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import { BiDislike, BiSolidDislike } from 'react-icons/bi';
 import { MdOutlineLocalMovies, MdLocalMovies } from 'react-icons/md';
@@ -29,9 +30,12 @@ export default function ResultadoRandom() {
 
   useEffect(() => {
     const data = localStorage.getItem('zion-random');
-    if (!data) { router.push('/sorteio'); return; }
+    if (!data) { 
+      router.push('/sorteio'); 
+      return; 
+    }
     setMovie(JSON.parse(data));
-  }, []);
+  }, [router]);
 
   async function handleLike(value: boolean) {
     if (!session) { setShowLoginWarning(true); return; }
@@ -62,90 +66,119 @@ export default function ResultadoRandom() {
   if (!movie) return null;
 
   return (
-    <main className="relative flex flex-col items-center justify-center min-h-screen gap-8 p-8 bg-[#0a0a0c] overflow-hidden">
-      <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-gradient-to-r from-indigo-900/30 to-purple-900/20 blur-[120px] pointer-events-none z-0" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] rounded-full bg-purple-900/10 blur-[100px] pointer-events-none z-0" />
+    <main className="relative flex justify-center min-h-screen overflow-hidden bg-[#0a0a0c] font-sans sm:py-8">
+      <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-900/30 to-indigo-900/20 blur-[120px] pointer-events-none z-0" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[280px] h-[280px] rounded-full bg-indigo-900/10 blur-[100px] pointer-events-none z-0" />
 
-      <div className="relative z-10 flex flex-col items-center gap-8 w-full max-w-3xl">
-        <div className="flex items-center justify-between w-full">
-          <div
-            className="text-xl font-light tracking-[0.25em] uppercase bg-clip-text text-transparent bg-gradient-to-r from-indigo-200 via-purple-300 to-slate-400 cursor-pointer"
-            onClick={() => router.push('/')}
-          >
-            Zion
+      {/* Container principal simulando a tela do mobile */}
+      <div className="relative w-full max-w-[430px] sm:rounded-[3rem] shadow-2xl overflow-hidden flex flex-col">
+        
+        {/* Pôster e Informações Sobrepostas */}
+        <div className="relative w-full aspect-[4/5] rounded-b-[2.5rem] overflow-hidden p-4 pt-6">
+          <div className="absolute inset-0 p-3 pt-6">
+            <div className="relative w-full h-full">
+              <img
+                src={movie.poster}
+                alt={movie.title}
+                className="w-full h-full object-cover rounded-[2rem] shadow-[0_0_40px_rgba(0,0,0,0.5)]"
+              />
+              {/* Overlay na imagem */}
+              <div className="absolute inset-0 rounded-[1.7rem] bg-gradient-to-t from-[#221844] via-black/30 to-transparent" />
+            </div>
           </div>
-          <p className="text-[10px] tracking-[0.3em] uppercase text-indigo-400/60">Sorteio aleatório</p>
+
+          {/* Título e Metadados (Esquerda Base do Pôster) */}
+          <div className="absolute bottom-10 left-8 pr-8">
+            <div className="flex flex-col items-start gap-3 mb-2 flex-wrap">
+              <h1 className="text-2xl font-extrabold text-[#DDD6FE] drop-shadow-md">
+                {movie.title}
+              </h1>
+            </div>
+            <p className="text-sm text-white/90 font-medium drop-shadow-md">
+              {movie.year} • {movie.runtime} • {movie.rating}{" "}
+              <MdStar className="inline text-[#DDD6FE] mb-1" />
+            </p>
+          </div>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-8 w-full p-6 rounded-2xl bg-gradient-to-br from-indigo-950/20 to-purple-950/10 border border-indigo-500/20 shadow-[0_0_40px_rgba(99,102,241,0.06)] backdrop-blur-md">
-          <img
-            src={movie.poster}
-            alt={movie.title}
-            className="w-44 rounded-xl self-start flex-shrink-0 shadow-[0_0_30px_rgba(0,0,0,0.5)]"
-          />
-          <div className="flex flex-col gap-3 flex-1">
-            <h2 className="text-3xl font-bold text-slate-100">{movie.title}</h2>
-            <p className="text-slate-500 text-sm">{movie.year} · {movie.runtime} · ⭐ {movie.rating}</p>
-            <p className="text-xs text-slate-500"><span className="text-slate-400">Diretor:</span> {movie.director}</p>
-            <p className="text-xs text-slate-500"><span className="text-slate-400">Elenco:</span> {movie.actors?.join(', ')}</p>
-            <p className="text-xs text-slate-500 leading-relaxed mt-1">{movie.plot}</p>
+        {/* Conteúdo Abaixo do Pôster */}
+        <div className="flex-1 px-6 py-2 flex flex-col">
+          {/* Botões de Ação Secundários */}
+          <div className="flex gap-3 overflow-x-auto no-scrollbar py-2">
+            <button
+              onClick={() => handleLike(true)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs border transition-all duration-300 ${liked === true ? 'bg-purple-500/20 border-purple-500/50 text-purple-300' : 'border-white/10 text-slate-400 hover:border-purple-500/30 hover:text-purple-300'}`}
+            >
+              {liked === true ? <AiFillHeart className="w-3 h-3" /> : <AiOutlineHeart className="w-3 h-3" />}
+              Curtir
+            </button>
+            <button
+              onClick={() => handleLike(false)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs border transition-all duration-300 ${liked === false ? 'bg-red-500/20 border-red-500/50 text-red-300' : 'border-white/10 text-slate-400 hover:border-red-500/30 hover:text-red-300'}`}
+            >
+              {liked === false ? <BiSolidDislike className="w-3 h-3" /> : <BiDislike className="w-3 h-3" />}
+              Não curtir
+            </button>
+            <button
+              onClick={handleWatched}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs border transition-all duration-300 ${watched ? 'bg-indigo-500/20 border-indigo-500/50 text-indigo-300' : 'border-white/10 text-slate-400 hover:border-indigo-500/30 hover:text-indigo-300'}`}
+            >
+              {watched ? <MdLocalMovies className="w-3 h-3" /> : <MdOutlineLocalMovies className="w-3 h-3" />}
+              {watched ? 'Assistido' : 'Já assisti'}
+            </button>
+          </div>
 
-            <div className="flex gap-2 mt-2 flex-wrap">
+          <h4 className="mt-4 text-lg font-semibold text-gray-300 leading-relaxed">
+            Sinopse
+          </h4>
+
+          {/* Sinopse */}
+          <p className="text-[13px] text-gray-300 leading-relaxed">
+            {movie.plot}
+          </p>
+
+          {/* Elenco / Diretor */}
+          <p className="mt-4 text-[9px] text-gray-400 font-bold uppercase tracking-widest leading-loose">
+            DIRETOR: {movie.director} <br />
+            ELENCO: {movie.actors?.join(', ') || 'Não informado'}
+          </p>
+
+          {/* Aviso de Login */}
+          {showLoginWarning && (
+            <div className="mt-4 p-3 rounded-xl border border-yellow-500/30 bg-yellow-500/10 flex justify-between items-center">
+              <span className="text-yellow-400 text-xs">
+                Faça login para salvar!
+              </span>
               <button
-                onClick={() => handleLike(true)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs border transition-all duration-300 ${liked === true ? 'bg-purple-500/20 border-purple-500/50 text-purple-300' : 'border-white/10 text-slate-400 hover:border-purple-500/30 hover:text-purple-300'}`}
+                onClick={() => router.push('/login')}
+                className="text-xs font-bold text-yellow-400 underline"
               >
-                {liked === true ? <AiFillHeart className="w-3 h-3" /> : <AiOutlineHeart className="w-3 h-3" />}
-                Curtir
-              </button>
-              <button
-                onClick={() => handleLike(false)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs border transition-all duration-300 ${liked === false ? 'bg-red-500/20 border-red-500/50 text-red-300' : 'border-white/10 text-slate-400 hover:border-red-500/30 hover:text-red-300'}`}
-              >
-                {liked === false ? <BiSolidDislike className="w-3 h-3" /> : <BiDislike className="w-3 h-3" />}
-                Não curtir
-              </button>
-              <button
-                onClick={handleWatched}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs border transition-all duration-300 ${watched ? 'bg-indigo-500/20 border-indigo-500/50 text-indigo-300' : 'border-white/10 text-slate-400 hover:border-indigo-500/30 hover:text-indigo-300'}`}
-              >
-                {watched ? <MdLocalMovies className="w-3 h-3" /> : <MdOutlineLocalMovies className="w-3 h-3" />}
-                {watched ? 'Assistido' : 'Marcar assistido'}
+                Login
               </button>
             </div>
+          )}
 
-            {showLoginWarning && (
-              <div className="flex flex-col gap-2 mt-2 p-4 rounded-xl border border-yellow-500/30 bg-yellow-500/5">
-                <p className="text-yellow-400/80 text-xs">Faça login para curtir e salvar seu histórico!</p>
-                <button
-                  onClick={() => router.push('/login')}
-                  className="w-fit text-xs border border-white/10 px-4 py-2 rounded-full hover:border-purple-500/40 hover:text-purple-300 text-slate-400 transition-all duration-300"
-                >
-                  Fazer login
-                </button>
-              </div>
-            )}
+          {/* Espaçador flexível para empurrar as abas para baixo */}
+          <div className="flex-1 min-h-[2rem]" />
+
+          {/* Abas Inferiores (Navegação/Ações Principais) */}
+          <div className="mt-auto mb-6 flex bg-[#161618] rounded-full p-1 border border-white/5 shadow-lg">
+            <button
+              onClick={() => router.push('/sorteio')}
+              className="flex-1 bg-violet-600 hover:bg-violet-500 text-white text-[11px] font-bold uppercase tracking-[0.2em] py-3.5 rounded-full shadow-lg shadow-violet-900/40 transition-all active:scale-95"
+            >
+              Sortear Outro
+            </button>
+
+            <button
+              onClick={() => session ? router.push('/home') : setShowLoginWarning(true)}
+              className="flex-1 text-violet-200 text-[11px] font-bold uppercase tracking-[0.2em] py-3.5 rounded-full hover:bg-violet-500/20 hover:border-violet-400 hover:text-white transition-all"
+            >
+              Histórico
+            </button>
           </div>
         </div>
 
-        <div className="flex gap-3">
-          <button
-            onClick={() => router.push('/sorteio')}
-            className="group relative inline-flex items-center gap-3 px-6 py-3 text-xs font-semibold tracking-[0.2em] uppercase rounded-full bg-white/[0.04] border border-white/10 hover:border-indigo-500/40 text-slate-200 hover:text-white backdrop-blur-md hover:shadow-[0_0_30px_rgba(99,102,241,0.2)] transition-all duration-500 overflow-hidden"
-          >
-            <span className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            Sortear outro
-          </button>
-          {session && (
-            <button
-              onClick={() => router.push('/home')}
-              className="group relative inline-flex items-center gap-3 px-6 py-3 text-xs font-semibold tracking-[0.2em] uppercase rounded-full bg-white/[0.04] border border-white/10 hover:border-purple-500/40 text-slate-200 hover:text-white backdrop-blur-md hover:shadow-[0_0_30px_rgba(168,85,247,0.2)] transition-all duration-500 overflow-hidden"
-            >
-              <span className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              Ver histórico
-            </button>
-          )}
-        </div>
       </div>
     </main>
   );
