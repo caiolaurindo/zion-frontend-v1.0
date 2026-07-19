@@ -102,10 +102,10 @@ export default function Sorteio() {
         </button>
 
         <button
-          onClick={() => router.back()}
+          onClick={() => router.push("/home")}
           className="text-white text-xs hover:text-slate-400 transition tracking-widest uppercase"
         >
-          ← Voltar
+          ← VOLTAR PARA HOME 
         </button>
       </div>
     </main>

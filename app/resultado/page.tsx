@@ -7,7 +7,7 @@ import { MdStar, MdOutlinePlayCircleOutline } from "react-icons/md";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { BiDislike, BiSolidDislike } from "react-icons/bi";
 import { MdOutlineLocalMovies, MdLocalMovies } from "react-icons/md";
-import { IoShareSocialSharp } from "react-icons/io5";
+import { IoArrowBack, IoShareSocialSharp } from "react-icons/io5";
 
 interface Movie {
   suggestedBy: string;
@@ -95,12 +95,25 @@ export default function Resultado() {
   if (!movie) return null;
 
   return (
-    <main className="relative flex justify-center min-h-screen overflow-hidden bg-[#0a0a0c] font-sans sm:py-8">
-      <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[280px] h-[280px] rounded-full bg-gradient-to-r from-purple-900/30 to-indigo-900/20 blur-[120px] pointer-events-none z-0" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[280px] h-[280px] rounded-full bg-indigo-900/10 blur-[100px] pointer-events-none z-0" />
-
+    <main className="relative flex justify-center min-h-screen overflow-hidden bg-gradient-to-b from-[#12081f] via-[#0b0914] to-[#050507] font-sans sm:py-8">
+      <div className="absolute top-[-15%] left-1/2 -translate-x-1/2 w-[420px] h-[420px] rounded-full bg-purple-700/20 blur-[150px] pointer-events-none z-0" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[350px] h-[350px] rounded-full bg-indigo-700/15 blur-[140px] pointer-events-none z-0" />
+      <div className="absolute top-1/2 left-[-10%] w-[300px] h-[300px] rounded-full bg-fuchsia-700/10 blur-[130px] pointer-events-none z-0" />
       {/* Container principal simulando a tela do mobile da imagem */}
       <div className="relative w-full max-w-[430px]  sm:rounded-[3rem] shadow-2xl overflow-hidden flex flex-col ">
+        <button
+          onClick={() => router.push("/quiz")}
+          className="flex items-center gap-2 text-gray-500 hover:text-zinc-300 transition p-5"
+        >
+          <IoArrowBack size={22} />
+          <span>Voltar</span>
+        </button>
+        <h1 className="text-3xl font-light text-slate-100 leading-snug text-center">
+          <span className="text-transparent   bg-clip-text bg-gradient-to-r from-indigo-200 via-purple-300 to-purple-400 font-semibold">
+            Zion
+          </span>{" "}
+          Escolheu
+        </h1>
         {/* Pôster e Informações Sobrepostas */}
         <div className="relative w-full aspect-[4/5] rounded-b-[2.5rem] overflow-hidden p-4 pt-6">
           <div className="absolute inset-0 p-3 pt-6">
@@ -116,7 +129,7 @@ export default function Resultado() {
             </div>
           </div>
 
-         {/*  {/* Botões Flutuantes (Direita Topo) compartilhar
+          {/*  {/* Botões Flutuantes (Direita Topo) compartilhar
           <div className="absolute top-10 right-6 flex flex-col gap-3">
             <button
               onClick={() => handleLike(true)}
