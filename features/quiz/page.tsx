@@ -18,6 +18,11 @@ const questions = [
     ],
   },
   {
+    id: "company",
+    question: "Vai assistir com quem?",
+    options: ["Sozinho", "Com namorado(a)", "Com a família", "Com amigos"],
+  },
+  {
     id: "experience",
     question: "Que tipo de experiência você quer ter?",
     options: [
@@ -30,24 +35,18 @@ const questions = [
     ],
   },
   {
-    id: "company",
-    question: "Vai assistir com quem?",
-    options: ["Sozinho", "Com namorado(a)", "Com a família", "Com amigos"],
+    id: "era",
+    question: "Qual é o período que você prefere?",
+    options: [" antes dos 80s", 
+      "80s", 
+      "90s", 
+      "2000s", 
+      "não importa"],
   },
   {
     id: "duration",
     question: "Quanto tempo você tem?",
-    options: ["Menos de 1h30", "Até 2h", "Pode ser longo"],
-  },
-  {
-    id: "depth",
-    question: "Prefere algo mais...",
-    options: [
-      "Leve e fácil de assistir",
-      "Intenso e envolvente",
-      "Baseado em fatos reais",
-      "Cult ou diferente do convencional",
-    ],
+    options: [" até 1h30", "Até 2h", "Pode ser longo"],
   },
   {
     id: "origin",

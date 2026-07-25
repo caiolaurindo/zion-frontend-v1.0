@@ -19,6 +19,7 @@ interface Movie {
   rating: string;
   director: string;
   runtime: string;
+  genres: string[];
   plot: string;
   actors: string[];
   trailerUrl: string | null;
@@ -94,145 +95,167 @@ export default function ResultadoRandomPage() {
   if (!movie) return null;
 
   return (
-    <main className="relative flex justify-center min-h-screen overflow-hidden bg-gradient-to-b from-[#12081f] via-[#0b0914] to-[#050507] font-sans sm:py-8">
+    <main className="relative flex items-center justify-center min-h-screen overflow-x-hidden overflow-y-auto bg-gradient-to-b from-[#12081f] via-[#0b0914] to-[#050507] font-sans sm:py-8 p-4">
       <PageBackdrop />
-      <div className="relative w-full max-w-[430px] sm:rounded-[3rem] shadow-2xl overflow-hidden flex flex-col">
-        <button
-          onClick={() => router.push("/sorteio")}
-          className="flex items-center gap-2 text-gray-500 hover:text-zinc-300 transition p-5"
-        >
-          <IoArrowBack size={22} />
-          <span>Voltar</span>
-        </button>
-        <h1 className="text-3xl font-light text-slate-100 leading-snug text-center">
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 via-purple-300 to-purple-400 font-semibold">
-            Zion
-          </span>{" "}
-          Sorteou
-        </h1>
 
-        <div className="relative w-full aspect-[4/5] rounded-b-[2.5rem] overflow-hidden p-4 pt-6">
-          <div className="absolute inset-0 p-3 pt-6">
-            <div className="relative w-full h-full">
-              <img
-                src={movie.poster}
-                alt={movie.title}
-                className="w-full h-full object-cover rounded-[2rem] shadow-[0_0_40px_rgba(0,0,0,0.5)]"
-              />
-              <div className="absolute inset-0 rounded-[1.7rem] bg-gradient-to-t from-[#221844] via-black/30 to-transparent" />
-            </div>
-          </div>
+      {/* Container principal responsivo: vira grid de 12 colunas no desktop */}
+      <div className="relative w-full max-w-[430px] md:max-w-[900px] sm:rounded-[3rem] shadow-2xl overflow-hidden flex flex-col md:grid md:grid-cols-12 bg-[#0b0914]/40 backdrop-blur-md border border-white/5">
+        {/* Coluna da Esquerda: Poster e Título (5 colunas) */}
+        <div className="relative md:col-span-5 flex flex-col justify-between h-full">
+          <button
+            onClick={() => router.push("/sorteio")}
+            className="flex items-center gap-2 text-gray-500 hover:text-zinc-300 transition p-5 z-10"
+          >
+            <IoArrowBack size={22} />
+            <span>Voltar</span>
+          </button>
 
-          <div className="absolute bottom-10 left-8 pr-8">
-            <div className="flex flex-col items-start gap-3 mb-2 flex-wrap">
-              <h1 className="text-2xl font-extrabold text-[#DDD6FE] drop-shadow-md">
-                {movie.title}
-              </h1>
+          <h1 className="text-3xl font-light text-slate-100 leading-snug text-center z-10">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 via-purple-300 to-purple-400 font-semibold">
+              Zion
+            </span>{" "}
+            Sorteou
+          </h1>
+
+          <div className="relative w-full aspect-[4/5] rounded-b-[2.5rem] md:rounded-b-none overflow-hidden p-4 pt-6 flex-1">
+            <div className="absolute inset-0 p-3 pt-6">
+              <div className="relative w-full h-full">
+                <img
+                  src={movie.poster}
+                  alt={movie.title}
+                  className="w-full h-full object-cover rounded-[2rem] shadow-[0_0_40px_rgba(0,0,0,0.5)]"
+                />
+                <div className="absolute inset-0 rounded-[1.7rem] bg-gradient-to-t from-[#221844] via-black/30 to-transparent" />
+              </div>
             </div>
-            <p className="text-sm text-white/90 font-medium drop-shadow-md">
-              {movie.year} • {movie.runtime} • {movie.rating}{" "}
-              <MdStar className="inline text-[#DDD6FE] mb-1" />
-            </p>
+
+            <div className="absolute bottom-10 left-8 pr-8">
+              <div className="flex flex-col items-start gap-3  flex-wrap">
+                <h1 className="text-2xl font-extrabold text-[#DDD6FE] drop-shadow-md">
+                  {movie.title}
+                </h1>
+              </div>
+              <p className="text-sm text-white/90 font-medium drop-shadow-md">
+                {movie.year} • {movie.runtime} • {movie.rating}{" "}
+                <MdStar className="inline text-[#DDD6FE] mb-1" />
+              </p>
+              {movie.genres && movie.genres.length > 0 && (
+                <div className="flex gap-2 flex-wrap mt-1">
+                  {movie.genres.map((g) => (
+                    <span
+                      key={g}
+                      className="px-2 py-1 rounded-full text-[9px] tracking-widest uppercase border border-purple-500/20 text-purple-400/70 bg-purple-500/5"
+                    >
+                      {g}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="flex-1 px-6 py-2 flex flex-col">
-          <div className="flex gap-3 overflow-x-auto no-scrollbar py-2">
-            <button
-              onClick={() => handleLike(true)}
-              className={`flex items-center gap-2 rounded-full border border-white/5 bg-[#161618] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] transition-all duration-300 ${liked === true ? "bg-violet-600 text-white shadow-lg shadow-violet-900/40" : "text-slate-300 hover:border-violet-400 hover:text-white"}`}
-            >
-              {liked === true ? (
-                <AiFillHeart className="w-3 h-3" />
-              ) : (
-                <AiOutlineHeart className="w-3 h-3" />
-              )}
-              Curtir
-            </button>
-            <button
-              onClick={() => handleLike(false)}
-              className={`flex items-center gap-2 rounded-full border border-white/5 bg-[#161618] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] transition-all duration-300 ${liked === false ? "bg-violet-600 text-white shadow-lg shadow-violet-900/40" : "text-slate-300 hover:border-violet-400 hover:text-white"}`}
-            >
-              {liked === false ? (
-                <BiSolidDislike className="w-3 h-3" />
-              ) : (
-                <BiDislike className="w-3 h-3" />
-              )}
-              Não curtir
-            </button>
-            <button
-              onClick={handleWatched}
-              className={`flex items-center gap-2 rounded-full border border-white/5 bg-[#161618] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] transition-all duration-300 ${watched ? "bg-violet-600 text-white shadow-lg shadow-violet-900/40" : "text-slate-300 hover:border-violet-400 hover:text-white"}`}
-            >
-              {watched ? (
-                <MdLocalMovies className="w-3 h-3" />
-              ) : (
-                <MdOutlineLocalMovies className="w-3 h-3" />
-              )}
-              {watched ? "Assistido" : "Já assisti"}
-            </button>
-          </div>
-
-          <h4 className="mt-4 text-lg font-semibold text-gray-300 leading-relaxed">
-            Sinopse
-          </h4>
-          <p className="text-[13px] text-gray-300 leading-relaxed">
-            {movie.plot}
-          </p>
-
-          <p className="mt-4 text-[9px] text-gray-400 font-bold uppercase tracking-widest leading-loose">
-            DIRETOR: {movie.director} <br />
-            ELENCO: {movie.actors?.join(", ") || "Não informado"}
-          </p>
-
-          {showLoginWarning && (
-            <div className="mt-4 p-3 rounded-xl border border-yellow-500/30 bg-yellow-500/10 flex justify-between items-center">
-              <span className="text-yellow-400 text-xs">
-                Faça login para salvar!
-              </span>
+        {/* Coluna da Direita: Botões, Sinopse, Elenco, Trailer e Streamings (7 colunas) */}
+        <div className="flex-1 md:col-span-7 px-6 py-2 md:py-8 flex flex-col justify-between h-full md:max-h-[85vh] md:overflow-y-auto no-scrollbar">
+          <div>
+            <div className="flex gap-2 overflow-x-auto no-scrollbar py-2">
               <button
-                onClick={() => router.push("/login")}
-                className="text-xs font-bold text-yellow-400 underline"
+                onClick={() => handleLike(true)}
+                className={`flex items-center gap-1 rounded-full border border-white/5 bg-[#161618] px-2 py-2 text-[9px] font-bold uppercase tracking-[0.2em] transition-all duration-300 ${liked === true ? "bg-violet-600 text-white shadow-lg shadow-violet-900/40" : "text-slate-300 hover:border-violet-400 hover:text-white"}`}
               >
-                Login
+                {liked === true ? (
+                  <AiFillHeart className="w-3 h-3" />
+                ) : (
+                  <AiOutlineHeart className="w-3 h-3" />
+                )}
+                Curtir
+              </button>
+              <button
+                onClick={() => handleLike(false)}
+                className={`flex items-center gap-1 rounded-full border border-white/5 bg-[#161618] px-2 py-2 text-[9px] font-bold uppercase tracking-[0.2em] transition-all duration-300 ${liked === false ? "bg-violet-600 text-white shadow-lg shadow-violet-900/40" : "text-slate-300 hover:border-violet-400 hover:text-white"}`}
+              >
+                {liked === false ? (
+                  <BiSolidDislike className="w-3 h-3" />
+                ) : (
+                  <BiDislike className="w-3 h-3" />
+                )}
+                Não curtir
+              </button>
+              <button
+                onClick={handleWatched}
+                className={`flex items-center gap-1 rounded-full border border-white/5 bg-[#161618] px-2 py-2 text-[9px] font-bold uppercase tracking-[0.2em] transition-all duration-300 ${watched ? "bg-violet-600 text-white shadow-lg shadow-violet-900/40" : "text-slate-300 hover:border-violet-400 hover:text-white"}`}
+              >
+                {watched ? (
+                  <MdLocalMovies className="w-3 h-3" />
+                ) : (
+                  <MdOutlineLocalMovies className="w-3 h-3" />
+                )}
+                {watched ? "Assistido" : "Já assisti"}
               </button>
             </div>
-          )}
-          <h4 className="mt-4 text-lg font-semibold text-gray-300 leading-relaxed">
-            Trailer
-          </h4>
 
-          {movie.trailerUrl && (
-            <div className="flex flex-col gap-2 mt-2">
-              <div
-                className="relative w-full max-w-[500px] rounded-xl overflow-hidden"
-                style={{ aspectRatio: "16/9" }}
-              >
-                <iframe
-                  src={`https://www.youtube.com/embed/${new URL(movie.trailerUrl).searchParams.get("v")}`}
-                  title="Trailer"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-full h-full rounded-xl"
-                />
+            <h4 className="mt-4 text-lg font-semibold text-gray-300 leading-relaxed">
+              Sinopse
+            </h4>
+            <p className="text-[13px] text-gray-300 leading-relaxed">
+              {movie.plot}
+            </p>
+
+            <p className="mt-4 text-[9px] text-gray-400 font-bold uppercase tracking-widest leading-loose">
+              DIRETOR: {movie.director} <br />
+              ELENCO: {movie.actors?.join(", ") || "Não informado"}
+            </p>
+
+            {showLoginWarning && (
+              <div className="mt-4 p-3 rounded-xl border border-yellow-500/30 bg-yellow-500/10 flex justify-between items-center">
+                <span className="text-yellow-400 text-xs">
+                  Faça login para salvar!
+                </span>
+                <button
+                  onClick={() => router.push("/login")}
+                  className="text-xs font-bold text-yellow-400 underline"
+                >
+                  Login
+                </button>
               </div>
+            )}
+
+            <h4 className="mt-4 text-lg font-semibold text-gray-300 leading-relaxed">
+              Trailer
+            </h4>
+
+            {movie.trailerUrl && (
+              <div className="flex flex-col gap-2 mt-2">
+                <div
+                  className="relative w-full max-w-[500px] rounded-xl overflow-hidden"
+                  style={{ aspectRatio: "16/9" }}
+                >
+                  <iframe
+                    src={`https://www.youtube.com/embed/${new URL(movie.trailerUrl).searchParams.get("v")}`}
+                    title="Trailer"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full h-full rounded-xl"
+                  />
+                </div>
+              </div>
+            )}
+
+            <h4 className="mt-4 text-lg font-semibold text-gray-300 leading-relaxed">
+              Onde assistir
+            </h4>
+
+            <div className="flex items-center gap-2 mt-4 flex-wrap">
+              {movie.streamingProviders?.map((p) => (
+                <img
+                  key={p.name}
+                  src={p.logo}
+                  alt={p.name}
+                  title={p.name}
+                  className="w-8 h-8 rounded-md object-cover bg-white"
+                />
+              ))}
             </div>
-          )}
-
-          <h4 className="mt-4 text-lg font-semibold text-gray-300 leading-relaxed">
-            Onde assistir
-          </h4>
-
-          <div className="flex items-center gap-2 mt-4 flex-wrap">
-            {movie.streamingProviders?.map((p) => (
-              <img
-                key={p.name}
-                src={p.logo}
-                alt={p.name}
-                title={p.name}
-                className="w-8 h-8 rounded-md object-cover bg-white"
-              />
-            ))}
           </div>
 
           <div className="mt-6 mb-6 flex bg-[#161618] rounded-full p-1 border border-white/5 shadow-lg">
