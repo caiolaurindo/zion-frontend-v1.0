@@ -1,0 +1,6 @@
+projectKey=zion-front
+serverUrl=http://localhost:9000
+serverVersion=26.7.0.124771
+dashboardUrl=http://localhost:9000/dashboard?id=zion-front
+ceTaskId=89aca9b4-8c2a-474c-ae94-75490385e817
+ceTaskUrl=http://localhost:9000/api/ce/task?id=89aca9b4-8c2a-474c-ae94-75490385e817
