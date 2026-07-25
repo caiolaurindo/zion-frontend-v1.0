@@ -21,6 +21,7 @@ interface Movie {
   director: string;
   runtime: string;
   plot: string;
+  genres: string[];
   actors: string[];
   trailerUrl: string | null;
   streamingProviders: { name: string; logo: string }[];
@@ -37,6 +38,7 @@ export default function ResultadoPage() {
   const [liked, setLiked] = useState<boolean | null>(null);
   const [watched, setWatched] = useState(false);
   const [showLoginWarning, setShowLoginWarning] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     if (!isReady) {
@@ -152,6 +154,18 @@ export default function ResultadoPage() {
                 {movie.year} • {movie.runtime} • {movie.rating}{" "}
                 <MdStar className="inline text-[#DDD6FE] mb-1" />
               </p>
+              {movie.genres && movie.genres.length > 0 && (
+                <div className="flex gap-2 flex-wrap mt-2.5">
+                  {movie.genres.map((g) => (
+                    <span
+                      key={g}
+                      className="px-2 py-1  rounded-full text-[9px] tracking-widest uppercase border border-purple-500/20 text-purple-400/70 bg-purple-500/5"
+                    >
+                      {g}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -159,12 +173,24 @@ export default function ResultadoPage() {
         {/* Coluna da Direita: Ações, Sinopse, Elenco, Trailer e Onde assistir (Ocupa 7/12 colunas no desktop) */}
         <div className="flex-1 md:col-span-7 px-6 py-2 md:py-8 flex flex-col justify-between h-full md:max-h-[85vh] md:overflow-y-auto no-scrollbar">
           <div>
-            <h4 className="mt-4 text-lg font-semibold text-gray-300 leading-relaxed">
+            <h4 className="mt-4 text-lg font-semibold text-gray-300">
               Sinopse
             </h4>
-            <p className="text-[13px] text-gray-300 leading-relaxed">
+
+            <p
+              className={`text-[13px] text-gray-300 leading-relaxed ${
+                expanded ? "" : "line-clamp-3"
+              }`}
+            >
               {movie.plot}
             </p>
+
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="mt-2 text-sm font-medium text-purple-500 hover:text-purple-400"
+            >
+              {expanded ? "Ver menos" : "Ler mais"}
+            </button>
 
             <p className="mt-4 text-[9px] text-gray-400 font-bold uppercase tracking-widest leading-loose">
               DIRETOR: {movie.director} <br />
@@ -184,10 +210,10 @@ export default function ResultadoPage() {
                 </button>
               </div>
             )}
-            <div className="flex gap-3 overflow-x-auto no-scrollbar py-2">
+            <div className="flex gap-2 overflow-x-auto no-scrollbar py-2">
               <button
                 onClick={() => handleLike(true)}
-                className={`flex items-center gap-2 rounded-full border border-white/5 bg-[#161618] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] transition-all duration-300 ${liked === true ? "bg-violet-600 text-white shadow-lg shadow-violet-900/40" : "text-slate-300 hover:border-violet-400 hover:text-white"}`}
+                className={`flex items-center gap-1 rounded-full border border-white/5 bg-[#161618] px-2 py-2 text-[9px] font-bold uppercase tracking-[0.2em] transition-all duration-300 ${liked === true ? "bg-violet-600 text-white shadow-lg shadow-violet-900/40" : "text-slate-300 hover:border-violet-400 hover:text-white"}`}
               >
                 {liked === true ? (
                   <AiFillHeart className="w-3 h-3" />
@@ -198,7 +224,7 @@ export default function ResultadoPage() {
               </button>
               <button
                 onClick={() => handleLike(false)}
-                className={`flex items-center gap-2 rounded-full border border-white/5 bg-[#161618] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] transition-all duration-300 ${liked === false ? "bg-violet-600 text-white shadow-lg shadow-violet-900/40" : "text-slate-300 hover:border-violet-400 hover:text-white"}`}
+                className={`flex items-center gap-1 rounded-full border border-white/5 bg-[#161618] px-2 py-2 text-[9px] font-bold uppercase tracking-[0.2em] transition-all duration-300 ${liked === false ? "bg-violet-600 text-white shadow-lg shadow-violet-900/40" : "text-slate-300 hover:border-violet-400 hover:text-white"}`}
               >
                 {liked === false ? (
                   <BiSolidDislike className="w-3 h-3" />
@@ -209,7 +235,7 @@ export default function ResultadoPage() {
               </button>
               <button
                 onClick={handleWatched}
-                className={`flex items-center gap-2 rounded-full border border-white/5 bg-[#161618] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] transition-all duration-300 ${watched ? "bg-violet-600 text-white shadow-lg shadow-violet-900/40" : "text-slate-300 hover:border-violet-400 hover:text-white"}`}
+                className={`flex items-center gap-1 rounded-full border border-white/5 bg-[#161618] px-2 py-2 text-[9px] font-bold uppercase tracking-[0.2em] transition-all duration-300 ${watched ? "bg-violet-600 text-white shadow-lg shadow-violet-900/40" : "text-slate-300 hover:border-violet-400 hover:text-white"}`}
               >
                 {watched ? (
                   <MdLocalMovies className="w-3 h-3" />
