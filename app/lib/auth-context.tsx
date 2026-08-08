@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
+import { supabase } from './supabase';
 
 interface AuthUser {
   email?: string;
@@ -33,26 +34,91 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const rawSession = localStorage.getItem('zion-session');
-    const rawUser = localStorage.getItem('zion-user');
+    let mounted = true;
 
-    if (rawSession) {
+    async function loadInitialAuth() {
+      const rawSession = localStorage.getItem('zion-session');
+      const rawUser = localStorage.getItem('zion-user');
+
+      if (rawSession && rawUser) {
+        try {
+          setSession(JSON.parse(rawSession) as AuthSession);
+          setUser(JSON.parse(rawUser) as AuthUser);
+        } catch {
+          localStorage.removeItem('zion-session');
+          localStorage.removeItem('zion-user');
+        }
+      }
+
       try {
-        setSession(JSON.parse(rawSession) as AuthSession);
+        const { data: urlData } = await supabase.auth.getSessionFromUrl();
+        let sessionData = urlData?.session ?? null;
+
+        if (!sessionData) {
+          const { data } = await supabase.auth.getSession();
+          sessionData = data?.session ?? null;
+        }
+
+        if (sessionData?.access_token) {
+          const authUser: AuthUser = {
+            email: sessionData.user.email ?? undefined,
+            name:
+              sessionData.user.user_metadata?.name ??
+              sessionData.user.user_metadata?.full_name ??
+              sessionData.user.email?.split('@')[0],
+          };
+
+          const authSession: AuthSession = {
+            access_token: sessionData.access_token,
+          };
+
+          if (mounted) {
+            setSession(authSession);
+            setUser(authUser);
+            localStorage.setItem('zion-session', JSON.stringify(authSession));
+            localStorage.setItem('zion-user', JSON.stringify(authUser));
+          }
+        }
       } catch {
-        localStorage.removeItem('zion-session');
+        // Ignore session restoration failures and keep the fallback behavior.
+      } finally {
+        if (mounted) setLoading(false);
       }
     }
 
-    if (rawUser) {
-      try {
-        setUser(JSON.parse(rawUser) as AuthUser);
-      } catch {
-        localStorage.removeItem('zion-user');
-      }
-    }
+    loadInitialAuth();
 
-    setLoading(false);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, sessionData) => {
+      if (sessionData?.access_token) {
+        const authUser: AuthUser = {
+          email: sessionData.user.email ?? undefined,
+          name:
+            sessionData.user.user_metadata?.name ??
+            sessionData.user.user_metadata?.full_name ??
+            sessionData.user.email?.split('@')[0],
+        };
+
+        const authSession: AuthSession = {
+          access_token: sessionData.access_token,
+        };
+
+        setSession(authSession);
+        setUser(authUser);
+        localStorage.setItem('zion-session', JSON.stringify(authSession));
+        localStorage.setItem('zion-user', JSON.stringify(authUser));
+        return;
+      }
+
+      localStorage.removeItem('zion-session');
+      localStorage.removeItem('zion-user');
+      setSession(null);
+      setUser(null);
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   async function signOut() {
