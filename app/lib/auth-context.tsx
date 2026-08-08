@@ -1,14 +1,22 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from './supabase';
-import { Session, User } from '@supabase/supabase-js';
+
+interface AuthUser {
+  email?: string;
+  name?: string;
+}
+
+interface AuthSession {
+  access_token: string;
+}
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
+  user: AuthUser | null;
+  session: AuthSession | null;
   loading: boolean;
   signOut: () => Promise<void>;
+  setAuth: (sessionData: AuthSession, userData: AuthUser) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -16,34 +24,53 @@ const AuthContext = createContext<AuthContextType>({
   session: null,
   loading: true,
   signOut: async () => {},
+  setAuth: () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [session, setSession] = useState<AuthSession | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      setLoading(false);
-    });
+    const rawSession = localStorage.getItem('zion-session');
+    const rawUser = localStorage.getItem('zion-user');
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-    });
+    if (rawSession) {
+      try {
+        setSession(JSON.parse(rawSession) as AuthSession);
+      } catch {
+        localStorage.removeItem('zion-session');
+      }
+    }
 
-    return () => listener.subscription.unsubscribe();
+    if (rawUser) {
+      try {
+        setUser(JSON.parse(rawUser) as AuthUser);
+      } catch {
+        localStorage.removeItem('zion-user');
+      }
+    }
+
+    setLoading(false);
   }, []);
 
   async function signOut() {
-    await supabase.auth.signOut();
+    localStorage.removeItem('zion-session');
+    localStorage.removeItem('zion-user');
+    setSession(null);
+    setUser(null);
+  }
+
+  function setAuth(sessionData: AuthSession, userData: AuthUser) {
+    localStorage.setItem('zion-session', JSON.stringify(sessionData));
+    localStorage.setItem('zion-user', JSON.stringify(userData));
+    setSession(sessionData);
+    setUser(userData);
   }
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, signOut, setAuth }}>
       {children}
     </AuthContext.Provider>
   );

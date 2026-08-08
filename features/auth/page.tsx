@@ -4,39 +4,117 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/app/lib/supabase";
 import PageBackdrop from "@/features/shared/components/PageBackdrop";
+import { loginAuth, registerAuth } from "@/features/shared/services/auth";
+import { useAuth } from "@/app/lib/auth-context";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { setAuth } = useAuth();
+  const [name, setName] = useState("");
+  const [age, setAge] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isRegister, setIsRegister] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function handleGoogle() {
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/home`,
-      },
-    });
+    setError("");
+    try {
+      await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/home`,
+        },
+      });
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Falha ao iniciar login com Google.");
+      }
+    }
   }
 
   async function handleSubmit() {
     setLoading(true);
     setError("");
+    setSuccess("");
 
-    const { error } = isRegister
-      ? await supabase.auth.signUp({ email, password })
-      : await supabase.auth.signInWithPassword({ email, password });
+    try {
+      if (isRegister) {
+        const payload = {
+          name: name.trim(),
+          age: Number(age),
+          email: email.trim(),
+          password,
+        };
 
-    if (error) {
-      setError(error.message);
+        if (!payload.name || !payload.age || !payload.email || !payload.password) {
+          throw new Error("Preencha todos os campos para criar sua conta.");
+        }
+
+        const result = await registerAuth(payload);
+
+        if (result.access_token) {
+          setAuth(
+            { access_token: result.access_token },
+            {
+              email: result.email ?? payload.email,
+              name: result.name ?? payload.name,
+            },
+          );
+          router.push("/home");
+          return;
+        }
+
+        const loginResult = await loginAuth({ email: payload.email, password });
+        const loginToken = loginResult.access_token ?? loginResult.accessToken;
+
+        if (!loginToken) {
+          throw new Error("Cadastro concluído, mas não foi possível autenticar.");
+        }
+
+        setAuth(
+          { access_token: loginToken },
+          {
+            email: loginResult.email ?? loginResult.user?.email ?? payload.email,
+            name: loginResult.name ?? loginResult.user?.name ?? payload.name,
+          },
+        );
+        router.push("/home");
+        return;
+      }
+
+      if (!email || !password) {
+        throw new Error("Informe email e senha para entrar.");
+      }
+
+      const result = await loginAuth({ email: email.trim(), password });
+      const token = result.access_token ?? result.accessToken;
+
+      if (!token) {
+        throw new Error("Não foi possível obter o token de acesso.");
+      }
+
+      setAuth(
+        { access_token: token },
+        {
+          email: result.email ?? result.user?.email ?? email.trim(),
+          name: result.name ?? result.user?.name ?? "",
+        },
+      );
+      router.push("/home");
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Ocorreu um erro. Tente novamente.");
+      }
+    } finally {
       setLoading(false);
-      return;
     }
-
-    router.push("/home");
   }
 
   return (
@@ -90,6 +168,26 @@ export default function LoginPage() {
           <div className="h-px flex-1 bg-gradient-to-l from-transparent via-white/10 to-white/10" />
         </div>
 
+        {isRegister && (
+          <>
+            <input
+              type="text"
+              placeholder="Nome completo"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-slate-100 placeholder:text-slate-500 backdrop-blur-md outline-none transition-all duration-300 focus:border-purple-400/50 focus:bg-white/[0.05] focus:shadow-[0_0_25px_rgba(168,85,247,.15)]"
+            />
+            <input
+              type="number"
+              min="1"
+              placeholder="Idade"
+              value={age}
+              onChange={(e) => setAge(e.target.value)}
+              className="w-full rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-slate-100 placeholder:text-slate-500 backdrop-blur-md outline-none transition-all duration-300 focus:border-purple-400/50 focus:bg-white/[0.05] focus:shadow-[0_0_25px_rgba(168,85,247,.15)]"
+            />
+          </>
+        )}
+
         <input
           type="email"
           placeholder="Email"
@@ -111,6 +209,12 @@ export default function LoginPage() {
           </p>
         )}
 
+        {success && (
+          <p className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+            {success}
+          </p>
+        )}
+
         <button
           onClick={handleSubmit}
           disabled={loading}
@@ -120,25 +224,14 @@ export default function LoginPage() {
           <span className="relative z-10">
             {loading ? "Carregando..." : isRegister ? "Criar conta" : "Entrar"}
           </span>
-          {!loading && (
-            <svg
-              className="relative z-10 w-3 h-3 transform group-hover:translate-x-1 transition-transform duration-300 text-slate-400 group-hover:text-purple-300"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2.5}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-              />
-            </svg>
-          )}
         </button>
 
         <button
-          onClick={() => setIsRegister(!isRegister)}
+          onClick={() => {
+            setIsRegister(!isRegister);
+            setError("");
+            setSuccess("");
+          }}
           className="text-sm text-slate-400 transition-colors duration-300 hover:text-purple-300"
         >
           {isRegister
