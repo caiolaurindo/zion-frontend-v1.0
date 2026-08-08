@@ -51,13 +51,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       try {
-        const { data: urlData } = await supabase.auth.getSessionFromUrl();
-        let sessionData = urlData?.session ?? null;
-
-        if (!sessionData) {
-          const { data } = await supabase.auth.getSession();
-          sessionData = data?.session ?? null;
-        }
+        const { data } = await supabase.auth.getSession();
+        const sessionData = data?.session ?? null;
 
         if (sessionData?.access_token) {
           const authUser: AuthUser = {
