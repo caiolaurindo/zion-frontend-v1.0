@@ -22,12 +22,24 @@ export default function LoginPage() {
   async function handleGoogle() {
     setError("");
     try {
-      await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/home`,
         },
       });
+
+      if (error) {
+        setError(error.message || "Falha ao iniciar login com Google.");
+        return;
+      }
+
+      if (data?.url) {
+        window.location.href = data.url;
+        return;
+      }
+
+      setError("Não foi possível iniciar o redirecionamento para Google.");
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
