@@ -40,7 +40,7 @@ export default function HomePage() {
   } | null>(null);
 
   const firstName =
-    user?.user_metadata?.full_name?.split(" ")[0] ??
+    user?.name?.split(" ")[0] ??
     user?.email?.split("@")[0] ??
     "por aqui";
 
