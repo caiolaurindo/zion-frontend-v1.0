@@ -10,6 +10,7 @@ import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { BiDislike, BiSolidDislike } from "react-icons/bi";
 import { MdOutlineLocalMovies, MdLocalMovies } from "react-icons/md";
 import { IoArrowBack } from "react-icons/io5";
+import MovieTicket from "../shared/components/MovieTicket";
 
 interface Movie {
   historyId?: string;
@@ -275,6 +276,14 @@ export default function ResultadoRandomPage() {
               Histórico
             </button>
           </div>
+          <MovieTicket
+            title={movie.title}
+            poster={movie.poster}
+            year={movie.year}
+            rating={movie.rating}
+            runtime={movie.runtime}
+            genres={movie.genres ?? []}
+          />
         </div>
       </div>
     </main>

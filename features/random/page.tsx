@@ -85,7 +85,7 @@ export default function RandomPage() {
               <div className="w-4 h-4 rounded-full border-2 border-indigo-300 border-t-transparent animate-spin" />
               Sorteando...
             </>
-          ) : (
+          ) : ( 
             <>
               {selectedGenre
                 ? `Sortear em ${selectedGenre}`
