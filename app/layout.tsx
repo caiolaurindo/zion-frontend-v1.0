@@ -14,8 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Zion",
+  title: "Filme da Vez",
   description: "Seu guia de filmes personalizado",
+  icons: { icon: "/logoFilmeDaVez.svg" }
 };
 
 export default function RootLayout({
